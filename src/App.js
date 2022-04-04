@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import * as ReactBootStrap from "react-bootstrap";
 
@@ -26,15 +26,22 @@ const LAUNCHES_QUERY = `query launches {
 
 function App() {
   const [launches, setLaunches] = React.useState([]);
+  const [loading, setLoading] = useState(false);
   React.useEffect(() => {
+    setLoading(true);
     fetch("https://api.spacex.land/graphql/", {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({ query: LAUNCHES_QUERY }),
     })
       .then((response) => response.json())
-      .then((data) => setLaunches(data.data.launches));
+      .then((data) => {
+        setLaunches(data.data.launches);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="App">
